@@ -50,5 +50,19 @@ class Calculator:
 
 
 def evaluate(expr):
-    tokens = re.findall(r'[\d.]+|[+-/*()]', expr.replace(' ', ''))
-    return Calculator(tokens).exp()
+    expr = expr.replace(r'^\s+', '')
+
+    def remove_unmatched_from_pair(repl):
+        print(repl)
+        return repl.group(1) + repl.group(2)
+
+    expr = re.sub(r'([+-/*()]+)\s+([+-/*()]+)', remove_unmatched_from_pair, expr)
+    expr = re.sub(r'([+-/*()]+)\s+([\d+])', remove_unmatched_from_pair, expr)
+    expr = re.sub(r'([\d+])\s+([+-/*()]+)', remove_unmatched_from_pair, expr)
+
+    def calculate(repl):
+        calculate_tokens = re.findall(r'[\d.]+|[+-/*()]', repl.group(0))
+        return str(Calculator(calculate_tokens).exp())
+
+    result = re.sub('[\d+-/*()]+', calculate, expr)
+    return result
